@@ -1,9 +1,11 @@
 import sys
 import asyncio
+import json
 from typing import Optional, Any
 from contextlib import AsyncExitStack
 from mcp import ClientSession, StdioServerParameters, types
 from mcp.client.stdio import stdio_client
+from mcp.types import TextResourceContents
 
 
 class MCPClient:
@@ -59,8 +61,21 @@ class MCPClient:
         return []
 
     async def read_resource(self, uri: str) -> Any:
-        # TODO: Read a resource, parse the contents and return it
-        return []
+        result = await self.session().read_resource(uri)
+
+        # Extract text from the first content item (MCP resources can have multiple)
+        text = ""
+        for item in result.contents:
+            if isinstance(item, TextResourceContents):
+                text = item.text
+                break
+
+        # docs://documents returns a JSON list of doc IDs
+        if uri == "docs://documents":
+            return json.loads(text)
+
+        # docs://documents/{doc_id} returns plain text content
+        return text
 
     async def cleanup(self):
         await self._exit_stack.aclose()
