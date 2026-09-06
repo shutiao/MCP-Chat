@@ -12,13 +12,23 @@ docs = {
     "spec.txt": "These specifications define the technical requirements for the equipment.",
 }
 
-# TODO: Write a tool to read a doc
-# TODO: Write a tool to edit a doc
+@mcp.tool(name = "read_doc", description="Read the content of a document by ID")
+def read_doc(doc_id: str) -> str:
+    if doc_id not in docs:
+        raise ValueError(f"Document {doc_id} not found.")
+    return docs[doc_id]
+
+@mcp.tool(name = "edit_doc", description="Edit the content of a document by ID")    
+def edit_doc(doc_id: str, new_content: str) -> str:
+    if doc_id not in docs:
+        raise ValueError(f"Document {doc_id} not found.")
+    docs[doc_id] = new_content
+    return f"Document {doc_id} edited successfully."
+
 # TODO: Write a resource to return all doc id's
 # TODO: Write a resource to return the contents of a particular doc
 # TODO: Write a prompt to rewrite a doc in markdown format
 # TODO: Write a prompt to summarize a doc
-
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
